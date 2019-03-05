@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title> Library </title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  </head>
+  <body>
+    <div id = "BookList">
+  <h3> List of the Books</h3>
+      <table>
+        <thead>
+     <tr>
+       <th>Title</th>
+       <th>Author</th>
+     </tr>
+     </thead>
+
+       <tbody>
+       <tr>
+         <td>
+           <ul  class="a">
+           <% data.forEach(function(row){ %>
+             <a href= "/book/BookSummary/<%= row.title %>"><li><%= row.title %>
+              </a></li>
+               <% }) %>
+         </ul>
+       </td>
+         <td><ul  class="a">
+         <% data.forEach(function(row){ %>
+           <li><%= row.author %>
+            </li>
+             <% }) %>
+       </ul></td>
+       </tr>
+       <tr>
+    </table>
+     <a href='/book/Add'> Add Books...!!</a>
+    </body>
+</html>
