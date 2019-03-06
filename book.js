@@ -125,17 +125,23 @@ app.post('/upload', function(req, res, next) {
           publisher: req.body.publisher_name,
           photo_path: req.file ? req.file.filename : 'default.png'
         };
-        connection.query("INSERT INTO `bookList` SET ?", [values], function(error, result) {
+        connection.query("INSERT INTO `bookList` SET ?", [values], function(error, rows) {
           if (error) {
             next(error);
             return;
           } else {
-            res.writeHead(200, {
-              'content-type': 'application/json',
-              'content-Type': 'text/plain'
-            });
             console.log('Successful query');
-            res.end('Successfully inserted');
+            connection.query("SELECT * FROM bookList ", function(error, rows) {
+              if (error) {
+                next (err);
+                return;
+              } else {
+                //res.writeHead(200, {'content-type': 'application/json'});
+                console.log('Successful query');
+                //console.log(rows);''
+                res.render('start',{data: rows});
+              }
+            });
           }
         });
       }
