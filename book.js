@@ -22,7 +22,7 @@ Mongoose.connect("mongodb://localhost/books", (err, db) => {
   console.log('Connected');
 });
 
-const Schema = Mongoose.model("bookList", {
+const bookSchema = Mongoose.model("bookList", {
   title: String,
   author: String,
   publisher: String,
@@ -86,7 +86,7 @@ app.use(function check(error, req, res, next) {
 
 app.get('/book', function(req, res, next) {
   console.log('request was made: ' + req.url);
-  Schema.find({}, function(error, data) {
+  bookSchema.find({}, function(error, data) {
     if (error) {
       next(error);
       return;
@@ -105,10 +105,15 @@ app.get('/book/Add', function(req, res, next) {
 });
 
 app.get('/book/BookSummary/:title', function(req, res, next) {
-  let summaryBook = Schema.bookList(request.params.title).exec();
-  res.render('BookSummary', {
-    data: summaryBook
-  });
+  let t = req.params.title ;
+  bookSchema.find({ title: t}, function(error, data) {
+    if (error) {
+      next(error);
+      return;
+    } else {
+  res.render('BookSummary', { data: data });
+}
+});
 });
 
 app.post('/upload', function(req, res, next) {
@@ -123,11 +128,11 @@ app.post('/upload', function(req, res, next) {
           msg: 'Error: No file Selected !'
         });
       } else {
-        let newBook = new Schema();
+        let newBook = new bookSchema();
 
-        newBook.title = req.body.title;
-        newBook.author = req.body.author;
-        newBook.publisher = req.body.publisher;
+        newBook.title = req.body.book_name
+        newBook.author = req.body.author_name;
+        newBook.publisher = req.body.publisher_name;
         newBook.photo_path = req.file ? req.file.filename : 'default.png';
 
         newBook.save(function(error, data) {
@@ -136,18 +141,14 @@ app.post('/upload', function(req, res, next) {
             return;
           } else {
             console.log('Successful query');
-            app.get('/book', function(req, res, next) {
-              console.log('request was made: ' + req.url);
-              Schema.find({}, function(error, data) {
-                if (error) {
-                  next(error);
-                  return;
-                } else {
-                  console.log('Successful query');
-                  //console.log(rows);''
-                  res.render('start', {data: data});
-                }
-              });
+            bookSchema.find({}, function(error, data) {
+              if (error) {
+                next(error);
+                return;
+              } else {
+                console.log('Successful query');
+                res.render('start', { data: data });
+              }
             });
           }
         });
