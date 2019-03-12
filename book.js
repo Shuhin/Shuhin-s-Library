@@ -1,5 +1,3 @@
-let mysql = require('mysql');
-
 let express = require('express');
 
 const multer = require('multer');
@@ -10,15 +8,25 @@ const path = require('path');
 
 let bodyParser = require('body-parser');
 
+let Mongoose = require('mongoose')
+
 let app = express();
 
+const port = process.env.PORT || 3000;
 
 
-let connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'Books'
+Mongoose.connect("mongodb://localhost/books", (err, db) => {
+  if (err) {
+    return console.log('Unable to Connect');
+  }
+  console.log('Connected');
+});
+
+const Schema = Mongoose.model("bookList", {
+  title: String,
+  author: String,
+  publisher: String,
+  photo_path: String
 });
 
 const storage = multer.diskStorage({
@@ -78,33 +86,29 @@ app.use(function check(error, req, res, next) {
 
 app.get('/book', function(req, res, next) {
   console.log('request was made: ' + req.url);
-  connection.query("SELECT * FROM bookList ", function(error, rows) {
+  Schema.find({}, function(error, data) {
     if (error) {
-      next (err);
+      next(error);
       return;
     } else {
-      //res.writeHead(200, {'content-type': 'application/json'});
       console.log('Successful query');
-      //console.log(rows);''
-      res.render('start',{data: rows});
+      //res.json('bookList');
+      res.render('start', {
+        data: data
+      });
     }
   });
 });
 
 app.get('/book/Add', function(req, res, next) {
-      res.render('index');
+  res.render('index');
 });
 
 app.get('/book/BookSummary/:title', function(req, res, next) {
-  const title = req.params.title;
-  connection.query(`Select * from bookList WHERE title= '${title}'`, (error, rows) => {
-    if (error) {
-      next (error);
-      return;
-    } else {
-   res.render('BookSummary', {data: rows[0]});
- }
-});
+  let summaryBook = Schema.bookList(request.params.title).exec();
+  res.render('BookSummary', {
+    data: summaryBook
+  });
 });
 
 app.post('/upload', function(req, res, next) {
@@ -119,28 +123,31 @@ app.post('/upload', function(req, res, next) {
           msg: 'Error: No file Selected !'
         });
       } else {
-        let values = {
-          title: req.body.book_name,
-          author: req.body.author_name,
-          publisher: req.body.publisher_name,
-          photo_path: req.file ? req.file.filename : 'default.png'
-        };
-        connection.query("INSERT INTO `bookList` SET ?", [values], function(error, rows) {
+        let newBook = new Schema();
+
+        newBook.title = req.body.title;
+        newBook.author = req.body.author;
+        newBook.publisher = req.body.publisher;
+        newBook.photo_path = req.file ? req.file.filename : 'default.png';
+
+        newBook.save(function(error, data) {
           if (error) {
             next(error);
             return;
           } else {
             console.log('Successful query');
-            connection.query("SELECT * FROM bookList ", function(error, rows) {
-              if (error) {
-                next (err);
-                return;
-              } else {
-                //res.writeHead(200, {'content-type': 'application/json'});
-                console.log('Successful query');
-                //console.log(rows);''
-                res.render('start',{data: rows});
-              }
+            app.get('/book', function(req, res, next) {
+              console.log('request was made: ' + req.url);
+              Schema.find({}, function(error, data) {
+                if (error) {
+                  next(error);
+                  return;
+                } else {
+                  console.log('Successful query');
+                  //console.log(rows);''
+                  res.render('start', {data: data});
+                }
+              });
             });
           }
         });
@@ -149,6 +156,4 @@ app.post('/upload', function(req, res, next) {
   });
 });
 
-app.listen(4000, (err) => {
-  console.log("Now listening to port 4000", err);
-});
+app.listen(port);
