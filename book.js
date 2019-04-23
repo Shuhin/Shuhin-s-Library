@@ -105,15 +105,15 @@ app.get('/book/Add', function(req, res, next) {
 });
 
 app.get('/book/BookSummary/:title', function(req, res, next) {
-  let t = req.params.title ;
-  bookSchema.find({ title: t}, function(error, data) {
+  bookSchema.find({ title: req.params.title }, function(error, result) {
     if (error) {
       next(error);
       return;
     } else {
-  res.render('BookSummary', { data: data });
-}
-});
+  console.log(result);
+  res.render('BookSummary', { data: result });
+   }
+ });
 });
 
 app.post('/upload', function(req, res, next) {

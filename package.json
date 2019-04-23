@@ -4,6 +4,7 @@
   "description": "simple library management using devis, angular and mongodb",
   "main": "book.js",
   "scripts": {
+    "start": "nodemon book.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Shuhin",

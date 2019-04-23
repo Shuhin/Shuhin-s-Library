@@ -2,11 +2,11 @@
 
 
    <ul>
-       <li class="a"><font color="red">Title : </font> <%= data.title %></li>
-       <li class="a"><font color="red">Author : </font><%= data.author %>  </li>
-       <li class="a"><font color="red">publisher : </font><%= data.publisher %>  </li>
+       <li class="a"><font color="red">Title : </font> <%= data[0].title %></li>
+       <li class="a"><font color="red">Author : </font><%= data[0].author %>  </li>
+       <li class="a"><font color="red">publisher : </font><%= data[0].publisher %>  </li>
        <li>
-           <img class="book-img" src=/uploads/<%= data.photo_path %>
-       </li>
+           <img class="book-img"  height="400" width="300" src=/uploads/<%= data[0].photo_path %> 
+       </li> 
 
 </ul>
